@@ -100,6 +100,10 @@ class DoubleList<E> {
         pervious.prev = node;
     }
     //remove the i-th position of a list and return it
+    public E removeByIndex (int i){
+        Node<E> node = getIndex(i);
+        return remove(node);
+    }
 
     // get the i-th position
     public Node<E> getIndex(int i){

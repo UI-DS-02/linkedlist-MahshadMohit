@@ -1,18 +1,18 @@
 import java.util.Scanner;
 
-class DoubleList<E> {
+class DoublyLinkedList<E> {
     private static class Node<E> {
         private E element;
         private Node<E> prev;
         private Node<E> next;
 
-        public Node(E element, Node<E> prev, Node<E> next) {
-            this.element = element;
-            this.prev = prev;
-            this.next = next;
+        public Node(E e, Node<E> p, Node<E> n) {
+            element = e;
+            prev = p;
+            next = n;
         }
 
-        public E getElement() {
+        public E getElemnt() {
             return element;
         }
 
@@ -25,89 +25,115 @@ class DoubleList<E> {
         }
 
         public void setPrev(Node<E> p) {
-            this.prev = p;
+            prev = p;
         }
 
         public void setNext(Node<E> n) {
-            this.next = n;
+            next = n;
         }
-
-
     }
 
     private Node<E> header;
     private Node<E> trailer;
     private int size = 0;
 
-    public DoubleList() {
+    public DoublyLinkedList() {
         header = new Node<>(null, null, null);
         trailer = new Node<>(null, header, null);
         header.setNext(trailer);
     }
 
-    // size
+    // size function
+
     public int size() {
         return size;
     }
 
-    // isEmpty
+    // isEmpty function
+
     public boolean isEmpty() {
         return size == 0;
     }
 
-    // first
+    // first function
+
     public E first() {
-        if (isEmpty()) return null;
-        return header.getNext().getElement();
+        if (isEmpty()) {
+            return null;
+        }
+        return header.getNext().getElemnt();
     }
 
-    // last
+    // last function
+
     public E last() {
         if (isEmpty()) return null;
-        return trailer.getNext().getElement();
+        return trailer.getPrev().getElemnt();
     }
 
-    // add first
+    // addFirst function
+
     public void addFirst(E e) {
         addBetween(e, header, header.getNext());
     }
 
-    // add last
+    // addLast function
+
     public void addLast(E e) {
         addBetween(e, trailer.getPrev(), trailer);
     }
 
-    public void addBetween(E e, Node<E> pre, Node<E> s) {
-        Node<E> newst = new Node<>(e, pre, s);
-        pre.setNext(newst);
+    public void addBetween(E e, Node<E> p, Node<E> s) {
+        Node<E> newst = new Node<>(e, p, s);
+        p.setNext(newst);
         s.setPrev(newst);
         size++;
     }
 
-    // remove first
+    // removeFirst function
+
     public E removeFirst() {
         if (isEmpty()) return null;
         return remove(header.getNext());
     }
 
-    // remove last
+    // removeLast function
+
     public E removeLast() {
         if (isEmpty()) return null;
         return remove(trailer.getPrev());
     }
 
-    // sort
-    public void sort(DoubleList<Integer> list) {
-        Node<Integer> current = null;
-        current = list.header;
-        Node<Integer> next = null;
+    public E remove(Node<E> node) {
+        Node<E> p = node.getPrev();
+        Node<E> s = node.getNext();
+        p.setNext(s);
+        s.setPrev(p);
+        size--;
+        return node.getElemnt();
+    }
+
+    public void traverse() {
+        Node<E> node = header.getNext();
+        while (node != trailer) {
+            System.out.println(node.getElemnt());
+            node = node.getNext();
+        }
+    }
+
+    // sort function
+
+    public void sort(DoublyLinkedList<Integer> list) {
+        Node<Integer> current;
+        current = list.header.next;
+        Node<Integer> next;
         int temp;
         if (isEmpty()) {
-            //  ...
+            return;
         } else {
             for (; current.next != null; current = current.next) {
                 for (next = current.next; next != null; next = next.next) {
-                    if (current.getElement() > next.getElement()) {
+                    if (current.getElemnt() > next.getElemnt()) {
                         temp = current.element;
                         current.element = next.element;
                         next.element = temp;
@@ -117,7 +143,26 @@ class DoubleList<E> {
         }
     }
 
-    // add an element to the i-th position
+    // get function
+
+    public Node<E> getIndex(int i) {
+        Node<E> current = header;
+
+        for (int j = 1; j <= i; j++) {
+            current = current.next;
+        }
+        return current;
+    }
+
+    // remove element by its index function
+
+    public E removeByIndex(int i) {
+        Node<E> node = getIndex(i);
+        return remove(node);
+    }
+
+    // add an element to given index
+
     public void add(int i, E e) {
         int j = 1;
         Node<E> current = header;
@@ -133,76 +178,63 @@ class DoubleList<E> {
         pervious.prev = node;
     }
 
-    //remove the i-th position of a list and return it
-    public E removeByIndex(int i) {
-        Node<E> node = getIndex(i);
-        return remove(node);
-    }
-
-    // get the i-th position
-    public Node<E> getIndex(int i) {
-        Node<E> current = header;
-        Node<E> prev = null;
-        for (int j = 1; j <= i; j++) {
-            prev = current;
+    public void print(){
+        Node<E> current = header.next;
+        while (current!=null){
+            System.out.println(current.getElemnt());
             current = current.next;
         }
-        return current;
     }
-
-    public E remove(Node<E> node) {
-        Node<E> predecessor = node.getPrev();
-        Node<E> successor = node.getNext();
-        predecessor.setNext(successor);
-        successor.setPrev(predecessor);
-        size--;
-        return node.getElement();
-    }
-
-
 }
-
 
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        DoubleList<Integer> list = new DoubleList<>();
-        StringBuilder str = new StringBuilder();
+        DoublyLinkedList<Integer> list = new DoublyLinkedList<>();
         int n = sc.nextInt();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n; i++) {
             String command = sc.next();
-            if (command.startsWith("addFirst")) {
-                int j = sc.nextInt();
-                list.addFirst(j);
-            } else if (command.startsWith("add")) {
+            if (command.startsWith("size")){
+                sb.append(list.size()).append("\n");
+            }else if (command.startsWith("isEmpty")){
+                sb.append(list.isEmpty()).append("\n");
+            } else if (command.startsWith("first")) {
+                sb.append(list.first()).append("\n");
+            } else if (command.startsWith("last")) {
+                sb.append(list.last()).append("\n");
+            } else if (command.startsWith("addFirst")) {
                 int a = sc.nextInt();
-                int b = sc.nextInt();
-                list.add(a, b);
+                list.addFirst(a);
             } else if (command.startsWith("addLast")) {
                 int a = sc.nextInt();
                 list.addLast(a);
-            } else if (command.startsWith("size")) {
-                str.append(list.size()).append("\n");
-            } else if (command.startsWith("isEmpty")) {
-                str.append(list.isEmpty()).append("\n");
+
+            } else if (command.startsWith("removeFirst")) {
+                sb.append(list.removeFirst()).append("\n");
+            } else if (command.startsWith("removeLast")) {
+                sb.append(list.removeLast()).append("\n");
             } else if (command.startsWith("sort")) {
                 list.sort(list);
-            } else if (command.startsWith("get")) {
+            }else if(command.startsWith("add")){
                 int a = sc.nextInt();
-                str.append(list.getIndex(a)).append("\n");
-
-            } else if (command.startsWith("first")) {
-                str.append(list.first()).append("\n");
-            } else if (command.startsWith("last")) {
-                str.append(list.last()).append("\n");
-            } else if (command.startsWith("removeFirst")) {
-                str.append(list.removeFirst()).append("\n");
-            } else if (command.startsWith("removeLast")) {
-                str.append(list.removeLast()).append("\n");
+                int b = sc.nextInt();
+                list.add(a,b);
             } else if (command.startsWith("remove")) {
                 int a = sc.nextInt();
-                str.append(list.removeByIndex(a)).append("\n");
+                sb.append(list.removeByIndex(a)).append("\n");
+            } else if (command.startsWith("get")) {
+                int a = sc.nextInt();
+                sb.append(list.getIndex(a)).append("\n");
             }
         }
+        System.out.println(sb.toString());
+        list.print();
+
+
+
+
     }
+
+
 }
